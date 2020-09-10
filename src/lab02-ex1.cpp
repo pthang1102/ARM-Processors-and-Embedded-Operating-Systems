@@ -5,6 +5,11 @@
  *      Author: Thang Tran
  */
 
+/*
+ * INTRO: this program uses Mutex to guard write access to Debug Serial Port.
+ * Only one task can write to the Serial Port at a time.
+ */
+
 #if defined (__USE_LPCOPEN)
 #if defined(NO_BOARD_LIB)
 #include "chip.h"
@@ -35,6 +40,7 @@ static void prvSetupHardware(void)
 	Board_LED_Set(0, false);
 }
 
+// When SW1 is pressed, print 'SW1 pressed' to serial port.
 static void sw1Task(void *pvParameter) {
 	while (1) {
 		if (sw1_button.read() == false) {
@@ -44,6 +50,7 @@ static void sw1Task(void *pvParameter) {
 	}
 }
 
+// When SW2 is pressed, print 'SW2 pressed' to serial port.
 static void sw2Task(void *pvParameter) {
 	while (1) {
 		if (sw2_button.read() == false) {
@@ -53,6 +60,7 @@ static void sw2Task(void *pvParameter) {
 	}
 }
 
+// When SW3 is pressed, print 'SW3 pressed' to serial port.
 static void sw3Task(void *pvParameter) {
 	while (1) {
 		if (sw3_button.read() == false) {
