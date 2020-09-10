@@ -20,6 +20,12 @@
 #include "Syslog.h"
 #include <string.h>
 
+/*
+ * INTRO: this program stimulates an oracle that gives obscure answers to question,
+ * using COUNTING SEMAPHORE to notify Oracle that an answer is required.
+ * Both Reader-task and the Oracle write to Debug Serial Port,
+ * therefore, another semaphore is used to guard write access to Debug Serial Port.
+ */
 #define SECOND configTICK_RATE_HZ
 Syslog mutex = Syslog();
 SemaphoreHandle_t counting;
@@ -33,6 +39,11 @@ static void prvSetupHardware(void)
 	Board_LED_Set(0, false);
 }
 
+/* Read characters from Debug Serial Port until '\r' or '\n' is received,
+ Or 60 characters have been received. Then the characters are sent back to
+ the Serial Port preceded by '[You]'.
+ If a question mark '?' is received, oracle task is notified.
+ */
 void Task1(void *pvParameter) {
 	int index = 0;
 	int maxLength = 60;
@@ -70,6 +81,10 @@ void Task1(void *pvParameter) {
 	}
 }
 
+/*
+ * Wait for notification. When received, prints '[Oracle] Hmm...' and then after
+ * 3 seconds, print a random answer chosen from a premade list.
+ */
 void Task2(void *pvParameter)
 {
 	char *responses[10] {
@@ -122,8 +137,3 @@ int main(void)
 	/* Should never arrive here */
 	return 1;
 }
-
-
-
-
-
