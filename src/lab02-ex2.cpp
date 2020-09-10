@@ -5,6 +5,10 @@
  *      Author: Thang Tran
  */
 
+/*
+ * INTRO: this program use a BINARY SEMAPHORE to notify
+ * Serial port activity to the indicator task.
+ */
 #if defined (__USE_LPCOPEN)
 #if defined(NO_BOARD_LIB)
 #include "chip.h"
@@ -34,6 +38,8 @@ static void prvSetupHardware(void)
 	Board_LED_Set(2, false);
 }
 
+// Read characters from Debug Serial Port, and echoes them back to Serial Port.
+// When a character is received, send an indication to blinker task.
 static void Task1(void *pvParameter) {
 	while (1) {
 		int ch = Board_UARTGetChar();
@@ -44,6 +50,7 @@ static void Task1(void *pvParameter) {
 	}
 }
 
+// Blink the Led-light once whenever it receives an activity indication.
 static void Task2(void *pvParameter) {
 	while (1) {
 		if (xSemaphoreTake(binary, portMAX_DELAY) == pdPASS) {
@@ -90,8 +97,3 @@ int main(void)
 	/* Should never arrive here */
 	return 1;
 }
-
-
-
-
-
