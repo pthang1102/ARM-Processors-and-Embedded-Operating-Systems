@@ -38,6 +38,8 @@ static void prvSetupHardware(void)
 	Board_LED_Set(2, false);
 }
 
+// Send random numbers (0-199) to the back of the Queue.
+// Delay time: random 0.1-0.5s
 static void Task1(void *pvParameter) {
 	int number;
 	int delay;
@@ -49,6 +51,7 @@ static void Task1(void *pvParameter) {
 	}
 }
 
+// Monitor SW1. When pressed, send 112 to the FRONT of the Queue.
 static void Task2(void *pvParameter) {
 	int emergencyNumber = 112;
 	while (1) {
@@ -59,6 +62,8 @@ static void Task2(void *pvParameter) {
 	}
 }
 
+// Wait on the Queue and print the number it receives.
+// If it receive '112', print 'Help me' after the number, and sleep for 300ms.
 static void Task3(void *pvParameter) {
 	int buffer;
 	while (1) {
@@ -105,12 +110,3 @@ int main(void)
 	/* Should never arrive here */
 	return 1;
 }
-
-
-
-
-
-
-
-
-
