@@ -36,6 +36,8 @@ static void prvSetupHardware(void)
 	Board_LED_Set(2, false);
 }
 
+// Read from Debug serial port, count the number of characters (not '\r', '\n')
+// When end-of-line, send the number of characters to Back of the Queue.
 static void Task1(void *pvParameter) {
 	int counter = 0;
 	while (1) {
@@ -52,6 +54,7 @@ static void Task1(void *pvParameter) {
 	}
 }
 
+// Monitor SW1. When pressed, send '-1' to Back of the Queue.
 static void Task2(void *pvParameter) {
 	int minusOne = -1;
 	while (1) {
@@ -62,6 +65,8 @@ static void Task2(void *pvParameter) {
 	}
 }
 
+// Wait on the Queue and calculate the sum of integers received (not -1) from the Queue.
+// When -1 is received, Print out how many characters received totally.
 static void Task3(void *pvParameter) {
 	int buffer;
 	int sum = 0;
@@ -107,12 +112,3 @@ int main(void)
 	/* Should never arrive here */
 	return 1;
 }
-
-
-
-
-
-
-
-
-
