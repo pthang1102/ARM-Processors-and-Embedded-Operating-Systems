@@ -29,8 +29,8 @@ struct debugEvent {
 	uint32_t data[3];
 };
 
-// Create a queue capable of containing 5 int values.
-QueueHandle_t queue = 	xQueueCreate(3, sizeof(debugEvent));
+// Create a queue capable of containing 10 debugEvent objects.
+QueueHandle_t queue = 	xQueueCreate(10, sizeof(debugEvent));
 DigitalIoPin sw1_button(0, 17, DigitalIoPin::pullup);
 Syslog mutex = Syslog();
 
@@ -46,6 +46,7 @@ static void prvSetupHardware(void)
 	Board_LED_Set(2, false);
 }
 
+// Create a debugEvent object and send it to Queue
 void sendToQueue(const char *format, uint32_t d1, uint32_t d2, uint32_t d3) {
 	debugEvent sendToQueue = {
 			format,
@@ -54,6 +55,8 @@ void sendToQueue(const char *format, uint32_t d1, uint32_t d2, uint32_t d3) {
 	xQueueSendToBack( queue, &sendToQueue, portMAX_DELAY );
 }
 
+// Read SerialPort, Echoe back to Debug Serial Port.
+// When whiteSpace, call sendToQueue() to send info to Queue.
 static void readSerialPort(void *pvParameter) {
 	int counter = 0;
 	while (1) {
@@ -79,6 +82,8 @@ static void readSerialPort(void *pvParameter) {
 	}
 }
 
+// Monitor SW1, call sendtoQueue() when SW1 is pressed and released.
+// Length of press is sent to Queue.
 static void readSW1(void *pvParameter) {
 	int pressTime, releaseTime, time;
 	while (1) {
@@ -92,6 +97,8 @@ static void readSW1(void *pvParameter) {
 		vTaskDelay(2);
 	}
 }
+
+// Wait on Queue. Receive items from queue and print them to ITM debug console.
 void receiveQueueAndPrint(void *pvParameters) {
 	char buffer[64];
 	debugEvent e;
@@ -139,8 +146,3 @@ int main(void)
 	/* Should never arrive here */
 	return 1;
 }
-
-
-
-
-
